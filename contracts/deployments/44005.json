@@ -1,0 +1,10 @@
+{
+  "chainId": 44005,
+  "defaultCoolingOff": 120,
+  "deployer": "0x925A55c047af596EA98dF5E902E099E0490F16f3",
+  "identityRegistry": "0xAE63Cd12d1a7c3F8E1B494d79fe6373829b91049",
+  "identityRegistryImplementation": "0x02a8d3AcFD704F3e4812BC4fee1a7aC3c99BfAEc",
+  "invoicePay": "0x63DdA7ff73DFb7504eA1cC84aeCa26E9B7a682b0",
+  "minCoolingOff": 60,
+  "payeeRegistry": "0x6157173183409db90dc31cC26A9301D87433F482"
+}
