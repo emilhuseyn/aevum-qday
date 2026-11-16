@@ -5,3 +5,6 @@ node_modules/
 out/
 cache/
 broadcast/
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/31337/
