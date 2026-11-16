@@ -1,0 +1,11 @@
+{
+  "name": "@payeeguard/alto",
+  "private": true,
+  "description": "Our own ERC-4337 bundler (Pimlico Alto) against the Aevum testnet RPC; fallback to QDay's bundler.",
+  "scripts": {
+    "start": "node run-alto.mjs"
+  },
+  "dependencies": {
+    "@pimlico/alto": "0.0.21"
+  }
+}

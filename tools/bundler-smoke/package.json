@@ -1,0 +1,16 @@
+{
+  "name": "@payeeguard/bundler-smoke",
+  "private": true,
+  "type": "module",
+  "description": "Sends one ERC-4337 v0.7 UserOperation through a bundler on Aevum testnet to check the bundler and the zkEVM accept it.",
+  "scripts": {
+    "smoke": "tsx smoke.ts"
+  },
+  "dependencies": {
+    "permissionless": "0.5.2",
+    "viem": "2.57.14"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
+}
