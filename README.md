@@ -4,6 +4,9 @@
 Built for the Aevum Builder Challenge #1 on the QDay Aevum testnet (chain 44005), tracks: Confirmation of Payee,
 Invoice Payments, Native AI Assistants.
 
+**Live app: https://payeeguard-theta.vercel.app** (check & pay, business console, agent account; reads Aevum
+testnet directly, wallet needed only to sign). Also packaged as a Docker image: see the `Dockerfile`.
+
 > Every component below is deployed and was exercised end to end on Aevum testnet: transactions are linked in
 > [Live on Aevum](#live-on-aevum-testnet). Testnet only; no real funds.
 
