@@ -12,6 +12,7 @@ export const deployments = {
     "payeeRegistry": "0x6157173183409db90dc31cC26A9301D87433F482",
     "accountFactory": "0x9f91bAfDDbA52a55D38a5FEa123CA762742FC4BB",
     "accountImplementation": "0x9F839949d0362afA0752F8eAb4397FFdd961Fe56",
-    "entryPoint": "0x0000000071727De22E5E9d8BAf0edAc6f37da032"
+    "entryPoint": "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+    "paymaster": "0x8Df80bC67E09686C1250a408e8042c0B7A415a0f"
   }
 } as const;

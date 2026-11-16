@@ -26,6 +26,7 @@ export type PayeeGuardAddresses = {
   payeeRegistry: Address;
   invoicePay: Address;
   accountFactory: Address;
+  paymaster: Address;
   entryPoint: Address;
 };
 
@@ -37,6 +38,7 @@ export function payeeGuardAddresses(chainId: number = aevumTestnet.id): PayeeGua
     payeeRegistry: d.payeeRegistry as Address,
     invoicePay: d.invoicePay as Address,
     accountFactory: d.accountFactory as Address,
+    paymaster: d.paymaster as Address,
     entryPoint: (d.entryPoint as Address) ?? ENTRY_POINT_V07,
   };
 }

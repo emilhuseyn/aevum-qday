@@ -1,7 +1,7 @@
-import { http, type Chain, type Client, type JsonRpcAccount, type LocalAccount, type Transport } from "viem";
+import { http, type Address, type Chain, type Client, type JsonRpcAccount, type LocalAccount, type Transport } from "viem";
 import { createBundlerClient, type SmartAccount } from "viem/account-abstraction";
 import { estimateMaxPriorityFeePerGas, getBlock } from "viem/actions";
-import { QDAY_BUNDLER_URL } from "./chain.js";
+import { QDAY_BUNDLER_URL, payeeGuardAddresses } from "./chain.js";
 
 type AnyClient = Client<Transport, Chain | undefined, JsonRpcAccount | LocalAccount | undefined>;
 
@@ -30,18 +30,45 @@ export async function estimateUserOpFees(client: AnyClient, bundler: { request: 
 }
 
 /**
+ * paymasterAndData for PayeeGuardPaymaster: no extra data, gas paid from the account's prepaid tUSD8 credit.
+ * Stub gas limits are generous for estimation; the bundler's estimate replaces them.
+ */
+export function tusd8Paymaster(paymaster: Address) {
+  const data = {
+    paymaster,
+    paymasterData: "0x" as const,
+    paymasterVerificationGasLimit: 80_000n,
+    paymasterPostOpGasLimit: 50_000n,
+  };
+  return {
+    async getPaymasterStubData() {
+      return data;
+    },
+    async getPaymasterData() {
+      return data;
+    },
+  };
+}
+
+/**
  * Bundler client for a PayeeGuard account. Defaults to QDay's own bundler; pass our Alto URL as a fallback
- * (tools/alto) if it is down.
+ * (tools/alto) if it is down. `paymaster: true` pays gas in tUSD8 through PayeeGuardPaymaster.
  */
 export function createPayeeGuardBundlerClient(params: {
   account: SmartAccount;
   client: AnyClient;
   bundlerUrl?: string;
+  paymaster?: boolean | Address;
 }) {
+  const paymaster =
+    params.paymaster === true
+      ? payeeGuardAddresses(params.client.chain?.id).paymaster
+      : params.paymaster || undefined;
   return createBundlerClient({
     account: params.account,
     client: params.client,
     transport: http(params.bundlerUrl ?? QDAY_BUNDLER_URL),
+    paymaster: paymaster ? tusd8Paymaster(paymaster) : undefined,
     userOperation: {
       estimateFeesPerGas: async ({ bundlerClient }): Promise<{ maxFeePerGas: bigint; maxPriorityFeePerGas: bigint }> =>
         estimateUserOpFees(params.client, bundlerClient as never),

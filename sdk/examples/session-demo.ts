@@ -1,4 +1,5 @@
 // Lead 2 on Aevum testnet through QDay's own bundler (rundler, ERC-7562 safe mode):
+//   0. with the tUSD8 paymaster (default) the payer account never holds tQDAY: gas comes out of prepaid tUSD8 credit
 //   1. the owner grants an AI agent a session key (deploying the account through initCode if needed)
 //   2. the agent pays Forela's signed invoice within its caps            -> paid, receipt on chain
 //   3. the agent tries a 5.00 tUSD8 invoice                               -> rejected at validation (over cap)
@@ -18,6 +19,8 @@ import {
   explorerTx,
   grantSessionCall,
   makeInvoice,
+  payeeGuardAddresses,
+  payeeGuardPaymasterAbi,
   payInvoiceCall,
   revokeSessionCall,
   signInvoice,
@@ -32,7 +35,8 @@ const key = (name: string) => {
 };
 
 const FORELA_AGENT_ID = 0n; // registered by contracts/script/DemoFlow.s.sol
-const SALT = BigInt(process.env.DEMO_SALT ?? 1);
+const USE_PAYMASTER = !process.env.NO_PAYMASTER;
+const SALT = BigInt(process.env.DEMO_SALT ?? (USE_PAYMASTER ? 2 : 1));
 const BUNDLER_URL = process.env.BUNDLER_URL;
 
 const client = createPublicClient({ chain: aevumTestnet, transport: http() });
@@ -63,22 +67,39 @@ async function invoiceFor(reference: string, amount: string) {
 async function main() {
   const ownerAccount = await toPayeeGuardAccount({ client, owner, salt: SALT });
   const agentAccount = await toPayeeGuardAccount({ client, owner: owner.address, session: agent, salt: SALT });
-  const ownerBundler = createPayeeGuardBundlerClient({ account: ownerAccount, client, bundlerUrl: BUNDLER_URL });
-  const agentBundler = createPayeeGuardBundlerClient({ account: agentAccount, client, bundlerUrl: BUNDLER_URL });
+  const paymaster = payeeGuardAddresses().paymaster;
+  const ownerBundler = createPayeeGuardBundlerClient({ account: ownerAccount, client, bundlerUrl: BUNDLER_URL, paymaster: USE_PAYMASTER });
+  const agentBundler = createPayeeGuardBundlerClient({ account: agentAccount, client, bundlerUrl: BUNDLER_URL, paymaster: USE_PAYMASTER });
   console.log("smart account", ownerAccount.address, "owner", owner.address, "agent session", agent.address);
 
-  step("fund the smart account (gas in tQDAY until the tUSD8 paymaster lands; a little tUSD8 to spend)");
-  if ((await client.getBalance({ address: ownerAccount.address })) < parseEther("0.01")) {
-    const tx = await deployer.sendTransaction({ to: ownerAccount.address, value: parseEther("0.03") });
-    await client.waitForTransactionReceipt({ hash: tx });
-    console.log("tQDAY", explorerTx(tx));
+  if (USE_PAYMASTER) {
+    step("fund: an on-ramp prepays 0.02 tUSD8 of gas credit in the paymaster and sends 0.06 tUSD8 to spend (no tQDAY)");
+    const credit = await client.readContract({ address: paymaster, abi: payeeGuardPaymasterAbi, functionName: "credit", args: [ownerAccount.address] });
+    if (credit < parseUnits("0.005", 6)) {
+      const amount = parseUnits("0.02", 6);
+      const a = await deployer.writeContract({ address: TUSD8, abi: erc20Abi, functionName: "approve", args: [paymaster, amount] });
+      await client.waitForTransactionReceipt({ hash: a });
+      const d = await deployer.writeContract({ address: paymaster, abi: payeeGuardPaymasterAbi, functionName: "depositFor", args: [ownerAccount.address, amount] });
+      await client.waitForTransactionReceipt({ hash: d });
+      console.log("gas credit", explorerTx(d));
+    }
+  } else {
+    step("fund: 0.03 tQDAY for gas (no paymaster) and 0.06 tUSD8 to spend");
+    if ((await client.getBalance({ address: ownerAccount.address })) < parseEther("0.01")) {
+      const tx = await deployer.sendTransaction({ to: ownerAccount.address, value: parseEther("0.03") });
+      await client.waitForTransactionReceipt({ hash: tx });
+      console.log("tQDAY", explorerTx(tx));
+    }
   }
   const balance = await client.readContract({ address: TUSD8, abi: erc20Abi, functionName: "balanceOf", args: [ownerAccount.address] });
   if (balance < parseUnits("0.05", 6)) {
-    const tx = await deployer.writeContract({ address: TUSD8, abi: erc20Abi, functionName: "transfer", args: [ownerAccount.address, parseUnits("0.10", 6)] });
+    const tx = await deployer.writeContract({ address: TUSD8, abi: erc20Abi, functionName: "transfer", args: [ownerAccount.address, parseUnits("0.06", 6)] });
     await client.waitForTransactionReceipt({ hash: tx });
     console.log("tUSD8", explorerTx(tx));
   }
+  const creditBefore = USE_PAYMASTER
+    ? await client.readContract({ address: paymaster, abi: payeeGuardPaymasterAbi, functionName: "credit", args: [ownerAccount.address] })
+    : 0n;
 
   step("1. owner grants the agent a session: only Forela, 0.10 per payment, 0.15 per day, 7 days");
   const now = Number((await client.getBlock()).timestamp);
@@ -135,7 +156,12 @@ async function main() {
   }
 
   const left = await client.readContract({ address: TUSD8, abi: erc20Abi, functionName: "balanceOf", args: [ownerAccount.address] });
-  console.log("\naccount tUSD8 left:", usd(left));
+  const native = await client.getBalance({ address: ownerAccount.address });
+  console.log("\naccount tUSD8 left:", usd(left), "| account tQDAY:", formatEther(native));
+  if (USE_PAYMASTER) {
+    const creditAfter = await client.readContract({ address: paymaster, abi: payeeGuardPaymasterAbi, functionName: "credit", args: [ownerAccount.address] });
+    console.log("gas paid in tUSD8 by this run:", usd(creditBefore - creditAfter), "| credit left:", usd(creditAfter));
+  }
 }
 
 main().catch((e) => {

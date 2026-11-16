@@ -14,6 +14,7 @@ const CONTRACTS = {
   payeeRegistryAbi: "PayeeRegistry.sol/PayeeRegistry.json",
   payeeGuardAccountAbi: "PayeeGuardAccount.sol/PayeeGuardAccount.json",
   payeeGuardAccountFactoryAbi: "PayeeGuardAccountFactory.sol/PayeeGuardAccountFactory.json",
+  payeeGuardPaymasterAbi: "PayeeGuardPaymaster.sol/PayeeGuardPaymaster.json",
   identityRegistryAbi: "IdentityRegistryUpgradeable.sol/IdentityRegistryUpgradeable.json",
 };
 
