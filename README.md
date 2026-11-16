@@ -286,8 +286,8 @@ post-quantum signer support once QDay ships its precompiles.
 
 ## How this was built
 
-All code was written in the build window: the first code commit is `c4991d8` on 16 Nov 2026 at 11:47 (UTC+4).
-Earlier commits contain only planning notes.
+All code was written in the build window: the first code commit, "PayeeRegistry and InvoicePay with Foundry tests",
+is dated 16 Nov 2026 at 11:47 (UTC+4). The only earlier commit adds `.gitignore`.
 
 License: MIT (see [LICENSE](LICENSE)). The ERC-8004 contracts, OpenZeppelin and eth-infinitism account-abstraction
 are used as git submodules under their own licenses.
