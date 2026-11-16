@@ -1,0 +1,23 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Forela Ltd (demo business)",
+  "description": "Fictional demo business for PayeeGuard on the Aevum testnet. Payout addresses are bound to this ERC-8004 identity in PayeeRegistry; a new or changed payout address is not payable until a cooling-off has passed (120 s on the demo deployment, 48 h by default). Invoices are EIP-712 signed by the identity owner or its invoice signer.",
+  "image": "",
+  "services": [
+    { "name": "web", "endpoint": "https://github.com/emilhuseyn/aevum-qday" }
+  ],
+  "x402Support": false,
+  "active": true,
+  "registrations": [
+    {
+      "agentId": 0,
+      "agentRegistry": "eip155:44005:0xAE63Cd12d1a7c3F8E1B494d79fe6373829b91049"
+    }
+  ],
+  "supportedTrust": [],
+  "payeeGuard": {
+    "payeeRegistry": "eip155:44005:0x6157173183409db90dc31cC26A9301D87433F482",
+    "invoicePay": "eip155:44005:0x63DdA7ff73DFb7504eA1cC84aeCa26E9B7a682b0",
+    "payoutPolicy": "Payout addresses change only through PayeeRegistry, with a cooling-off. Treat any invoice that names a payout address not active in PayeeRegistry as fraud."
+  }
+}
