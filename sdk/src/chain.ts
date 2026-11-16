@@ -28,6 +28,8 @@ export type PayeeGuardAddresses = {
   accountFactory: Address;
   paymaster: Address;
   entryPoint: Address;
+  /** First block of the PayeeGuard deployment: where event scans start. */
+  deployBlock: bigint;
 };
 
 export function payeeGuardAddresses(chainId: number = aevumTestnet.id): PayeeGuardAddresses {
@@ -40,6 +42,7 @@ export function payeeGuardAddresses(chainId: number = aevumTestnet.id): PayeeGua
     accountFactory: d.accountFactory as Address,
     paymaster: d.paymaster as Address,
     entryPoint: (d.entryPoint as Address) ?? ENTRY_POINT_V07,
+    deployBlock: BigInt((d.deployBlock as number) ?? 0),
   };
 }
 

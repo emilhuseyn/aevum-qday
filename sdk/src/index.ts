@@ -1,8 +1,10 @@
 export * from "./abis.js";
 export * from "./chain.js";
 export * from "./invoice.js";
+export * from "./invoice-file.js";
 export * from "./account.js";
 export * from "./bundler.js";
 export * from "./errors.js";
 export * from "./payees.js";
+export * from "./identity.js";
 export { deployments } from "./deployments.js";

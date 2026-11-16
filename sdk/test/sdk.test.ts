@@ -146,3 +146,23 @@ describe.runIf(process.env.AEVUM_INTEGRATION === "1")("Aevum testnet", () => {
     expect(onchain).toBe(hashMessage({ raw: sessionMessage(h, 20_773) }));
   });
 });
+
+describe("signed invoice files", async () => {
+  const { toSignedInvoice, signedInvoiceBlock, serializeSignedInvoice, findSignedInvoice } = await import("../src/index.js");
+  const invoice = makeInvoice({ reference: "INV-7", payeeAgentId: 3n, payTo: business.address, token: TUSD8, amount: 250_000n, now: 1 });
+  const signed = toSignedInvoice(invoice, DUMMY_ECDSA, { businessName: "Forela Ltd" });
+
+  it("round-trips through an email text block", () => {
+    const email = `Hi,\nplease find our invoice below.\n\n${signedInvoiceBlock(signed)}\n\nThanks, Forela`;
+    expect(findSignedInvoice(email)).toEqual(signed);
+  });
+
+  it("round-trips through a JSON file", () => {
+    expect(findSignedInvoice(serializeSignedInvoice(signed))).toEqual(signed);
+  });
+
+  it("returns undefined when there is no invoice and rejects a cut-off block", () => {
+    expect(findSignedInvoice("please pay 0x1234 asap")).toBeUndefined();
+    expect(() => findSignedInvoice("-----BEGIN PAYEEGUARD INVOICE-----\nabc")).toThrow(/cut off/);
+  });
+});
