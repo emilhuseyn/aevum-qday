@@ -137,11 +137,15 @@ function InvoiceCheck({ signed, wallet }: { signed: SignedInvoice; wallet?: Wall
       >
         {check.loading && !v && <p className="muted">Checking on Aevum…</p>}
         {check.error && <Banner tone="warn" title="Check failed">{check.error}</Banner>}
-        {v && (
+        {v && (pay.hash && v.verdict === "AlreadyPaid" ? (
+          <Banner tone="ok" title="Paid">
+            You paid this invoice. The receipt is on chain, and paying it twice is blocked.
+          </Banner>
+        ) : (
           <Banner tone={tone} title={v.ok ? "Safe to pay" : "Do not pay"}>
             {v.message}
           </Banner>
-        )}
+        ))}
         <dl className="facts">
           <dt>Amount</dt>
           <dd className="big">{amountOf(inv.token, inv.amount)}</dd>
