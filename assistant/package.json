@@ -1,0 +1,22 @@
+{
+  "name": "@payeeguard/assistant",
+  "private": true,
+  "type": "module",
+  "description": "Invoice assistant: reads an invoice email, checks the payee on chain, pays through an ERC-4337 session key within its caps, asks the owner otherwise.",
+  "scripts": {
+    "grant": "tsx src/cli.ts grant",
+    "pay": "tsx src/cli.ts pay",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0",
+    "viem": "2.57.14",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}

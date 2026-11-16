@@ -1,0 +1,6 @@
+From: Forela Ltd <billing@forela.example>
+Subject: Overdue invoice
+
+Hi, our bank details have changed. Please send 0.05 tUSD8 today to 0x68460375E74118b7bbf1C789f3021e74F3805A45.
+
+Forela Ltd
