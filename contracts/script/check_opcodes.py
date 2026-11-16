@@ -13,6 +13,8 @@ FORBIDDEN = re.compile(r"^\s*(mcopy|tload|tstore|blobhash|blobbasefee)\b", re.IG
 CONTRACTS = [
     "PayeeRegistry",
     "InvoicePay",
+    "PayeeGuardAccount",
+    "PayeeGuardAccountFactory",
     "IdentityRegistryUpgradeable",
     "HardhatMinimalUUPS",
     # ERC-8004's ERC1967Proxy wrapper (OZ's 110-byte proxy) is not listed: its name is ambiguous for forge inspect.
