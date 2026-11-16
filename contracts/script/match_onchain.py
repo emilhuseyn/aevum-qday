@@ -20,6 +20,9 @@ TARGETS = {
     "identityRegistryImplementation": "IdentityRegistryUpgradeable.sol/IdentityRegistryUpgradeable.json",
     "payeeRegistry": "PayeeRegistry.sol/PayeeRegistry.json",
     "invoicePay": "InvoicePay.sol/InvoicePay.json",
+    "accountFactory": "PayeeGuardAccountFactory.sol/PayeeGuardAccountFactory.json",
+    "accountImplementation": "PayeeGuardAccount.sol/PayeeGuardAccount.json",
+    "paymaster": "PayeeGuardPaymaster.sol/PayeeGuardPaymaster.json",
 }
 
 
