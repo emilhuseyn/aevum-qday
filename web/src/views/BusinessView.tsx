@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAbiItem, isAddress, parseEventLogs, parseUnits, zeroAddress, type Address, type Hex } from "viem";
+import { isAddress, parseEventLogs, parseUnits, zeroAddress, type Address, type Hex } from "viem";
 import {
   TUSD8,
   getPayeeInfo,
-  getLogsPaged,
   identityRegistryAbi,
   makeInvoice,
   payeeGuardAddresses,
@@ -24,7 +23,6 @@ import {
   duration,
   errorText,
   publicClient,
-  recentFromBlock,
   useNow,
   utc,
   walletAsOwner,
@@ -34,6 +32,8 @@ import {
 
 const addresses = payeeGuardAddresses();
 const STORAGE_KEY = "payeeguard.agents";
+const AGENT_BATCH = 20n;
+const MAX_AGENT_SCAN = 2_000n;
 
 function rememberAgent(owner: Address, id: bigint) {
   try {
@@ -76,31 +76,24 @@ export function BusinessView({ wallet }: { wallet?: Wallet }) {
     if (!wallet) return;
     let live = true;
     (async () => {
-      const ids = new Set(rememberedAgents(wallet.address).map(String));
-      const fromBlock = await recentFromBlock(addresses.deployBlock);
-      const toBlock = await publicClient.getBlockNumber();
-      const logs = await getLogsPaged(
-        (r) =>
-          publicClient.getLogs({
-            address: addresses.identityRegistry,
-            event: getAbiItem({ abi: identityRegistryAbi, name: "Transfer" }),
-            args: { to: wallet.address },
-            ...r,
-          }),
-        fromBlock,
-        toBlock,
-      );
-      logs.forEach((l) => ids.add(String(l.args.tokenId)));
-      const owned: bigint[] = [];
-      for (const id of ids) {
-        const owner = await publicClient
-          .readContract({ address: addresses.identityRegistry, abi: identityRegistryAbi, functionName: "ownerOf", args: [BigInt(id)] })
-          .catch(() => zeroAddress);
-        if (owner.toLowerCase() === wallet.address.toLowerCase()) owned.push(BigInt(id));
+      // ERC-8004 agent ids are minted in order from 0, so walking ownerOf until the first unminted id finds every
+      // identity this wallet owns, however old (an event scan would hit Aevum's 1000-block getLogs cap).
+      const ownerOf = (id: bigint) =>
+        publicClient
+          .readContract({ address: addresses.identityRegistry, abi: identityRegistryAbi, functionName: "ownerOf", args: [id] })
+          .catch(() => undefined);
+      const mine = (o?: Address) => o?.toLowerCase() === wallet.address.toLowerCase();
+      const owned = new Set<bigint>();
+      for (let start = 0n; start < MAX_AGENT_SCAN; start += AGENT_BATCH) {
+        const batch = await Promise.all(Array.from({ length: Number(AGENT_BATCH) }, (_, i) => ownerOf(start + BigInt(i))));
+        batch.forEach((o, i) => mine(o) && owned.add(start + BigInt(i)));
+        if (batch.includes(undefined)) break;
       }
+      for (const id of rememberedAgents(wallet.address)) if (!owned.has(id) && mine(await ownerOf(id))) owned.add(id);
       if (live) {
-        setAgents(owned.sort((a, b) => Number(a - b)));
-        setSelected((s) => s ?? owned[0]);
+        const sorted = [...owned].sort((a, b) => Number(a - b));
+        setAgents(sorted);
+        setSelected((s) => s ?? sorted[0]);
       }
     })().catch(() => {});
     return () => {
@@ -274,7 +267,7 @@ function Agent({ wallet, agentId }: { wallet: Wallet; agentId: bigint }) {
               <tr key={p.address}>
                 <td><AddrLink address={p.address} /></td>
                 <td>
-                  <Chip tone={tones[p.status]}>{p.status === "CoolingOff" ? `cooling off · ${duration(Number(p.activeAt) - now)}` : p.status}</Chip>
+                  <Chip tone={tones[p.status]}>{p.status === "CoolingOff" ? `cooling off · ${duration(Number(p.activeAt) - now)}` : p.status === "None" ? "cancelled" : p.status}</Chip>
                 </td>
                 <td>{p.requestedAt ? ago(p.requestedAt, now) : ""}</td>
                 <td className="right">
