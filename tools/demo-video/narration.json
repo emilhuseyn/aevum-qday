@@ -1,0 +1,71 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "note": "say = what the synthetic voice reads; show = the caption (same sentences, written form). Scene ids match out/slides/<id>.jpg or out/frames/<id>/.",
+  "scenes": [
+    {
+      "id": "title",
+      "say": "This is PayeeGuard, by Emil Huseynov. Confirmation of payee for stablecoin invoices, on Q Day's Aevum testnet.",
+      "show": "This is PayeeGuard, by Emil Huseynov. Confirmation of payee for stablecoin invoices, on QDay's Aevum testnet."
+    },
+    {
+      "id": "problem",
+      "say": "The costliest invoice fraud is one sentence: our bank details have changed. Banks answer it with confirmation of payee. Stablecoin payments are instant and final, and have nothing like it. And an AI assistant that pays invoices can be talked into paying anyone.",
+      "show": "The costliest invoice fraud is one sentence: our bank details have changed. Banks answer it with confirmation of payee. Stablecoin payments are instant and final, and have nothing like it. And an AI assistant that pays invoices can be talked into paying anyone."
+    },
+    {
+      "id": "business-add",
+      "say": "Forela, a demo business, has an E R C eighty oh four identity on Aevum and one active payout address. To play the attacker, we add a new address with Forela's own key, as a thief with a stolen key would. The address is on chain at once, but it is not payable: a two minute cooling-off starts. In production it would be days.",
+      "show": "Forela, a demo business, has an ERC-8004 identity on Aevum and one active payout address. To play the attacker, we add a new address with Forela's own key, as a thief with a stolen key would. The address is on chain at once, but it is not payable: a 2-minute cooling-off starts. In production it would be days."
+    },
+    {
+      "id": "fake-check",
+      "say": "Now the fake invoice arrives: new bank details, urgent. Its signature is valid, because it really was signed with Forela's key, so a signature or name check would pass. PayeeGuard reads the payout address on chain: added a minute ago, still cooling off. Do not pay. Invoice Pay enforces the same rule on chain, so no other front end can skip it.",
+      "show": "Now the fake invoice arrives: new bank details, urgent. Its signature is valid, because it really was signed with Forela's key, so a signature or name check would pass. PayeeGuard reads the payout address on chain: added a minute ago, still cooling off. Do not pay. InvoicePay enforces the same rule on chain, so no other front end can skip it."
+    },
+    {
+      "id": "business-cancel",
+      "say": "Forela sees the new address in its list and cancels it inside the window, with one transaction. Pasted again, the same invoice is now refused for good: the address is no longer registered.",
+      "show": "Forela sees the new address in its list and cancels it inside the window, with one transaction. Pasted again, the same invoice is now refused for good: the address is no longer registered."
+    },
+    {
+      "id": "legit-pay",
+      "say": "A genuine invoice. The identity's registration file matches, and the payout address has been active for hours, so the verdict is green. The payer connects a wallet, signs one E I P twenty-six twelve permit and sends one transaction. The receipt is on chain, and paying the same invoice twice is blocked.",
+      "show": "A genuine invoice. The identity's registration file matches, and the payout address has been active for hours, so the verdict is green. The payer connects a wallet, signs one EIP-2612 permit and sends one transaction. The receipt is on chain, and paying the same invoice twice is blocked."
+    },
+    {
+      "id": "explorer",
+      "say": "The payment and its receipt are on Q Day's explorer.",
+      "show": "The payment and its receipt are on QDay's explorer."
+    },
+    {
+      "id": "assistant-pay",
+      "say": "Now an AI assistant that pays invoices. The owner grants it a session key on an E R C forty-three thirty-seven smart account: it may only call Invoice Pay, at most zero point one T U S D 8 per payment and zero point one five a day, to Forela only, for seven days. The account holds no T Q DAY. Gas is paid in T U S D 8 through our paymaster, and every user operation goes through Q Day's own bundler. The next email tells the AI to pay someone else. The assistant flags it, and pays only the payee in the signed invoice. A language model never chooses where money goes.",
+      "show": "Now an AI assistant that pays invoices. The owner grants it a session key on an ERC-4337 smart account: it may only call InvoicePay, at most 0.1 tUSD8 per payment and 0.15 a day, to Forela only, for seven days. The account holds no tQDAY. Gas is paid in tUSD8 through our paymaster, and every UserOperation goes through QDay's own bundler. The next email tells the AI to pay someone else. The assistant flags it, and pays only the payee in the signed invoice. A language model never chooses where money goes."
+    },
+    {
+      "id": "assistant-cap",
+      "say": "Half a token is over the cap, so the assistant asks the owner. A compromised assistant that sends it anyway is stopped by the account itself, during validation. Nothing reaches the chain.",
+      "show": "Half a token is over the cap, so the assistant asks the owner. A compromised assistant that sends it anyway is stopped by the account itself, during validation. Nothing reaches the chain."
+    },
+    {
+      "id": "agent-revoke",
+      "say": "On the agent account page, the owner sees the account: no native gas, credit in T U S D 8, each session's limits and today's spend, and every payment the agent made. One click revokes the key, signed by the owner and sent as a gasless user operation through Q Day's bundler.",
+      "show": "On the agent account page, the owner sees the account: no native gas, credit in tUSD8, each session's limits and today's spend, and every payment the agent made. One click revokes the key, signed by the owner and sent as a gasless UserOperation through QDay's bundler."
+    },
+    {
+      "id": "assistant-revoked",
+      "say": "The revoked key is dead. The assistant sees no active session and asks the owner. Forced to send anyway, it is rejected by the account during validation.",
+      "show": "The revoked key is dead. The assistant sees no active session and asks the owner. Forced to send anyway, it is rejected by the account during validation."
+    },
+    {
+      "id": "built",
+      "say": "Under the hood: the official E R C eighty oh four identity registry, our payee registry and Invoice Pay, an E R C forty-three thirty-seven account with the session policy inside validate user op, and a T U S D 8 paymaster, all running through Q Day's bundler in safe mode. Eighty-eight Foundry tests, a TypeScript SDK, and deployed bytecode matched to source.",
+      "show": "Under the hood: the official ERC-8004 identity registry, our PayeeRegistry and InvoicePay, an ERC-4337 account with the session policy inside validateUserOp, and a tUSD8 paymaster, all running through QDay's bundler in safe mode. 88 Foundry tests, a TypeScript SDK, and deployed bytecode matched to source."
+    },
+    {
+      "id": "close",
+      "say": "PayeeGuard: a check before every stablecoin invoice payment, for people and for agents. The live app and the code are linked in the description.",
+      "show": "PayeeGuard: a check before every stablecoin invoice payment, for people and for agents. The live app and the code are linked in the description."
+    }
+  ]
+}

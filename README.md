@@ -6,6 +6,8 @@ Invoice Payments, Native AI Assistants.
 
 **Live app: https://payeeguard-theta.vercel.app** (check & pay, business console, agent account; reads Aevum
 testnet directly, wallet needed only to sign). Also packaged as a Docker image: see the `Dockerfile`.
+**Demo video: https://payeeguard-theta.vercel.app/demo.html** (4 min, every transaction real; recorded and narrated
+by `tools/demo-video`, which drives the live app in headless Chrome with a test wallet; synthetic voice).
 
 > Every component below is deployed and was exercised end to end on Aevum testnet: transactions are linked in
 > [Live on Aevum](#live-on-aevum-testnet). Testnet only; no real funds.
@@ -162,6 +164,17 @@ Evidence (16 Nov 2026):
 | Owner revokes the session (next request fails `SessionNotActive`) | [`0x57e90f23…ad16`](https://explorer-test.qday.info/tx/0x57e90f23047ea40519bc2ff7deb00a638e1095cb696120f80912c9fcc88bad16) |
 | Assistant pays a real invoice; pays an injected email to the signed payee, not the injected one | [`0x91166207…e1ff`](https://explorer-test.qday.info/tx/0x911662072609e4f560ca907dc0a998f2dff3d3157fa73cb74284bb89a650e1ff), [`0xfaf9457b…2307`](https://explorer-test.qday.info/tx/0xfaf9457b2c88b4d611199c23f5f6320b9911547d3a290434da59e4db8dea2307) |
 
+The demo video run (16 Nov 2026, 21:35-21:48 Baku): the live web app driven with a test wallet, then the assistant.
+
+| What happened | Transaction |
+|---|---|
+| Business adds a "new bank details" payout address in the web app (cooling-off starts) | [`0x07d0a0b4…0f92`](https://explorer-test.qday.info/tx/0x07d0a0b453cc7e152f2670b866075bc97ce70fac9c7c1974b1fdf437cab20f92) |
+| Business cancels it inside the window | [`0x7eb29566…0408`](https://explorer-test.qday.info/tx/0x7eb29566fc332d1a222ee562e8aaebdf4d3ef752c0fb17b9dacbfc080ef90408) |
+| Payer pays a genuine invoice from the web app (EIP-2612 permit + one transaction) | [`0x641e8c22…f44b`](https://explorer-test.qday.info/tx/0x641e8c22e6c8e44955d63625b779c367ea05fb93b4830b5080f37a0320acf44b) |
+| Owner grants the assistant a session key (UserOperation, gas in tUSD8) | [`0x801cd6d9…b4fb`](https://explorer-test.qday.info/tx/0x801cd6d9d7d278ab1bbcb96b7971832b5140cd5a4cdcd3fef9277cf1ad69b4fb) |
+| Assistant pays an invoice; pays a prompt-injection email to the signed payee only | [`0x776ff17e…4631`](https://explorer-test.qday.info/tx/0x776ff17e5258a934e613e095dc5b9b07af7d75466a1d9f251a95312239ae4631), [`0xbf7e3849…9f14`](https://explorer-test.qday.info/tx/0xbf7e3849377aa24e801085762799cb9d853f98f1b3e7c96fff5760e545f79f14) |
+| Owner revokes the session from the web app (gasless UserOperation through QDay's bundler) | [`0x02a8b08a…198c`](https://explorer-test.qday.info/tx/0x02a8b08aeb2fa161fb92a36bcdd5edb4cc28a72ca72a30aafa2884f8aea2198c) |
+
 Rejected operations (over a cap, revoked key, policy-ignoring assistant) never reach the chain; they show up in the
 bundler's answer, decoded by the SDK, and in the assistant's log.
 
@@ -254,6 +267,11 @@ video script is in [`docs/DEMO.md`](docs/DEMO.md).
 | `contracts/test/PayeeGuardPaymaster.t.sol` | 7 | gas in tUSD8, reservation/refund, insufficient credit, no-native-token deployment |
 | `sdk/test` | 15 | signatures, invoices, invoice files, error decoding, on-chain parity (`AEVUM_INTEGRATION=1`) |
 | `assistant/test` | 11 | claims extraction, injection, every decision path |
+
+End to end, `tools/demo-video/record.ts` exercises every wallet write path of the live web app (add and cancel a
+payout address, permit payment, owner revoke through the bundler) plus the assistant, against Aevum testnet. It
+signs through a test-wallet bridge (`tools/demo-video/wallet.ts`: an EIP-1193 provider whose keys stay in the Node
+process). `py tools/demo-video/build_video.py` then narrates the footage into the demo video.
 
 ## Business model and roadmap
 

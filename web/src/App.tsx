@@ -66,6 +66,7 @@ export function App() {
       </main>
       <footer>
         <span>Testnet only (chain 44005, tUSD8).</span>
+        <span><a href="/demo.html">Demo video</a></span>
         <span>ERC-8004 <AddrLink address={addresses.identityRegistry} /></span>
         <span>PayeeRegistry <AddrLink address={addresses.payeeRegistry} /></span>
         <span>InvoicePay <AddrLink address={addresses.invoicePay} /></span>
